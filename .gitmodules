@@ -1,0 +1,9 @@
+[submodule "vendor/racon"]
+	path = vendor/racon
+	url = https://github.com/isovic/racon
+[submodule "vendor/rala"]
+	path = vendor/rala
+	url = https://github.com/rvaser/rala
+[submodule "vendor/minimap"]
+	path = vendor/minimap
+	url = https://github.com/lh3/minimap
