@@ -4,6 +4,6 @@
 [submodule "vendor/rala"]
 	path = vendor/rala
 	url = https://github.com/rvaser/rala
-[submodule "vendor/minimap"]
-	path = vendor/minimap
-	url = https://github.com/lh3/minimap
+[submodule "vendor/minimap2"]
+	path = vendor/minimap2
+	url = https://github.com/lh3/minimap2
