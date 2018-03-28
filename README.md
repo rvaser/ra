@@ -1,5 +1,7 @@
 # Ra
 
+[![Build status for c++/clang++](https://travis-ci.org/rvaser/ra.svg?branch=master)](https://travis-ci.org/rvaser/ra)
+
 Overlap-layout-consensus based DNA assembler of long uncorrected reads (short for Rapid Assembler).
 
 ## Description
