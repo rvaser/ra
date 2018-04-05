@@ -20,21 +20,21 @@ class Ra:
         self.tgs_type = tgs_type
         self.ngs_sequences = ngs_sequences
         self.threads = threads
-        self.work_directory = os.path.dirname(os.path.realpath(__file__)) +\
-            '/ra_work_directory_' + str(time.time())
+        self.work_directory = os.getcwd() + '/ra_work_directory_' + str(time.time())
 
+    def __enter__(self):
         try:
             os.makedirs(self.work_directory)
         except OSError:
             if (not os.path.isdir(self.work_directory)):
-                eprint('[Ra::__init__] error: unable to create work directory!')
+                eprint('[Ra::__enter__] error: unable to create work directory!')
                 sys.exit(1)
 
-    def __del__(self):
+    def __exit__(self, exception_type, exception_value, traceback):
         try:
             shutil.rmtree(self.work_directory)
         except OSError:
-            eprint('[Ra::__del__] warning: unable to clean work directory!')
+            eprint('[Ra::__exit__] warning: unable to clean work directory!')
 
     def run(self):
         # overlap
@@ -240,7 +240,7 @@ if __name__ == '__main__':
         format (can be compressed with gzip) containing next generation sequences
         for polishing''')
     parser.add_argument('-t', '--threads', default=1, help='''number of threads''')
-    parser.add_argument('--version', action='version', version='v0.1.0')
+    parser.add_argument('--version', action='version', version='v0.2.0')
 
     required_arguments = parser.add_argument_group('required arguments')
     required_arguments.add_argument('-x', dest='type', choices=['ont', 'pb'],
@@ -249,4 +249,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     ra = Ra(args.sequences, args.type, args.ngs_sequences, args.threads)
-    ra.run()
+
+    with ra:
+        ra.run()
