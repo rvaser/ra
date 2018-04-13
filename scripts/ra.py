@@ -14,11 +14,13 @@ class Ra:
     __rala = '@rala_path@'
     __racon = '@racon_path@'
 
-    def __init__(self, tgs_sequences, tgs_type, ngs_sequences, threads):
+    def __init__(self, tgs_sequences, tgs_type, ngs_sequences, include_unused,
+        threads):
 
         self.tgs_sequences = tgs_sequences
         self.tgs_type = tgs_type
         self.ngs_sequences = ngs_sequences
+        self.include_unused = include_unused
         self.threads = threads
         self.work_directory = os.getcwd() + '/ra_work_directory_' + str(time.time())
 
@@ -68,8 +70,10 @@ class Ra:
         # layout
         eprint('[Ra::run] layout stage')
 
-        rala_params = [Ra.__rala, '-t', str(self.threads), self.tgs_sequences,
-            overlaps]
+        rala_params = [Ra.__rala, '-t', str(self.threads)]
+        if (self.include_unused):
+            rala_params.extend(["-u"])
+        rala_params.extend([self.tgs_sequences, overlaps])
 
         layout = os.path.join(self.work_directory, "iter0.fasta")
         try:
@@ -118,8 +122,11 @@ class Ra:
 
         mappings_file.close()
 
-        racon_params = [Ra.__racon, '-t', str(self.threads), self.tgs_sequences,
-            mappings, layout]
+        racon_params = [Ra.__racon, '-t', str(self.threads)]
+        if (self.include_unused):
+            racon_params.extend(["-u"])
+
+        racon_params.extend([self.tgs_sequences, mappings, layout])
 
         consensus = os.path.join(self.work_directory, "iter1.fasta")
         try:
@@ -127,7 +134,7 @@ class Ra:
         except OSError:
             eprint('[Ra::run] error: unable to create consensus file!')
             sys.exit(1)
-
+        eprint(racon_params)
         try:
             p = subprocess.Popen(racon_params, stdout=consensus_file)
         except OSError:
@@ -170,7 +177,7 @@ class Ra:
             except OSError:
                 eprint('[Ra::run] error: unable to create consensus file!')
                 sys.exit(1)
-
+        eprint(racon_params)
         try:
             if (self.ngs_sequences is not None):
                 p = subprocess.Popen(racon_params, stdout=consensus_file)
@@ -239,6 +246,8 @@ if __name__ == '__main__':
     parser.add_argument('ngs_sequences', nargs='?', help='''input file in FASTA/FASTQ
         format (can be compressed with gzip) containing next generation sequences
         for polishing''')
+    parser.add_argument('-u', '--include-unused', action='store_true',
+        help='''output unassembled and unpolished sequences''')
     parser.add_argument('-t', '--threads', default=1, help='''number of threads''')
     parser.add_argument('--version', action='version', version='v0.2.0')
 
@@ -248,7 +257,8 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    ra = Ra(args.sequences, args.type, args.ngs_sequences, args.threads)
+    ra = Ra(args.sequences, args.type, args.ngs_sequences, args.include_unused,
+        args.threads)
 
     with ra:
         ra.run()
