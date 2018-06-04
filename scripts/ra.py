@@ -49,9 +49,9 @@ class Ra:
             minimap_params.extend(['-x', 'ava-pb'])
         minimap_params.extend([self.tgs_sequences, self.tgs_sequences])
 
-        overlaps = os.path.join(self.work_directory, "overlaps.paf")
+        overlaps = os.path.join(self.work_directory, 'overlaps.paf')
         try:
-            overlaps_file = open(overlaps, "w")
+            overlaps_file = open(overlaps, 'w')
         except OSError:
             eprint('[Ra::run] error: unable to create overlap file!')
             sys.exit(1)
@@ -72,12 +72,12 @@ class Ra:
 
         rala_params = [Ra.__rala, '-t', str(self.threads)]
         if (self.include_unused):
-            rala_params.extend(["-u"])
+            rala_params.extend(['-u'])
         rala_params.extend([self.tgs_sequences, overlaps])
 
-        layout = os.path.join(self.work_directory, "iter0.fasta")
+        layout = os.path.join(self.work_directory, 'iter0.fasta')
         try:
-            layout_file = open(layout, "w")
+            layout_file = open(layout, 'w')
         except OSError:
             eprint('[Ra::run] error: unable to create layout file!')
             sys.exit(1)
@@ -104,9 +104,9 @@ class Ra:
             minimap_params.extend(['-x', 'map-pb'])
         minimap_params.extend([layout, self.tgs_sequences])
 
-        mappings = os.path.join(self.work_directory, "mappings_iter0.paf")
+        mappings = os.path.join(self.work_directory, 'mappings_iter0.paf')
         try:
-            mappings_file = open(mappings, "w")
+            mappings_file = open(mappings, 'w')
         except OSError:
             eprint('[Ra::run] error: unable to create mappings file!')
             sys.exit(1)
@@ -124,13 +124,13 @@ class Ra:
 
         racon_params = [Ra.__racon, '-t', str(self.threads)]
         if (self.include_unused):
-            racon_params.extend(["-u"])
+            racon_params.extend(['-u'])
 
         racon_params.extend([self.tgs_sequences, mappings, layout])
 
-        consensus = os.path.join(self.work_directory, "iter1.fasta")
+        consensus = os.path.join(self.work_directory, 'iter1.fasta')
         try:
-            consensus_file = open(consensus, "w")
+            consensus_file = open(consensus, 'w')
         except OSError:
             eprint('[Ra::run] error: unable to create consensus file!')
             sys.exit(1)
@@ -149,9 +149,9 @@ class Ra:
         # second iteration
         minimap_params[-2] = consensus
 
-        mappings = os.path.join(self.work_directory, "mappings_iter1.paf")
+        mappings = os.path.join(self.work_directory, 'mappings_iter1.paf')
         try:
-            mappings_file = open(mappings, "w")
+            mappings_file = open(mappings, 'w')
         except OSError:
             eprint('[Ra::run] error: unable to create mappings file!')
             sys.exit(1)
@@ -171,9 +171,9 @@ class Ra:
         racon_params[-1] = consensus
 
         if (self.ngs_sequences is not None):
-            consensus = os.path.join(self.work_directory, "iter2.fasta")
+            consensus = os.path.join(self.work_directory, 'iter2.fasta')
             try:
-                consensus_file = open(consensus, "w")
+                consensus_file = open(consensus, 'w')
             except OSError:
                 eprint('[Ra::run] error: unable to create consensus file!')
                 sys.exit(1)
@@ -203,9 +203,9 @@ class Ra:
         minimap_params[-2] = consensus
         minimap_params[-1] = self.ngs_sequences
 
-        mappings = os.path.join(self.work_directory, "mappings_iter2.sam")
+        mappings = os.path.join(self.work_directory, 'mappings_iter2.sam')
         try:
-            mappings_file = open(mappings, "w")
+            mappings_file = open(mappings, 'w')
         except OSError:
             eprint('[Ra::run] error: unable to create mappings file!')
             sys.exit(1)
