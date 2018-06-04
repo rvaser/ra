@@ -99,12 +99,12 @@ class Ra:
         # first iteration
         minimap_params = [Ra.__minimap, '-t', str(self.threads)]
         if (self.tgs_type == 'ont'):
-            minimap_params.extend(['-ax', 'map-ont'])
+            minimap_params.extend(['-x', 'map-ont'])
         else:
-            minimap_params.extend(['-ax', 'map-pb'])
+            minimap_params.extend(['-x', 'map-pb'])
         minimap_params.extend([layout, self.tgs_sequences])
 
-        mappings = os.path.join(self.work_directory, "mappings_iter0.sam")
+        mappings = os.path.join(self.work_directory, "mappings_iter0.paf")
         try:
             mappings_file = open(mappings, "w")
         except OSError:
@@ -134,7 +134,7 @@ class Ra:
         except OSError:
             eprint('[Ra::run] error: unable to create consensus file!')
             sys.exit(1)
-        eprint(racon_params)
+
         try:
             p = subprocess.Popen(racon_params, stdout=consensus_file)
         except OSError:
@@ -149,7 +149,7 @@ class Ra:
         # second iteration
         minimap_params[-2] = consensus
 
-        mappings = os.path.join(self.work_directory, "mappings_iter1.sam")
+        mappings = os.path.join(self.work_directory, "mappings_iter1.paf")
         try:
             mappings_file = open(mappings, "w")
         except OSError:
@@ -177,7 +177,7 @@ class Ra:
             except OSError:
                 eprint('[Ra::run] error: unable to create consensus file!')
                 sys.exit(1)
-        eprint(racon_params)
+
         try:
             if (self.ngs_sequences is not None):
                 p = subprocess.Popen(racon_params, stdout=consensus_file)
@@ -249,7 +249,7 @@ if __name__ == '__main__':
     parser.add_argument('-u', '--include-unused', action='store_true',
         help='''output unassembled and unpolished sequences''')
     parser.add_argument('-t', '--threads', default=1, help='''number of threads''')
-    parser.add_argument('--version', action='version', version='v0.2.0')
+    parser.add_argument('--version', action='version', version='v0.2.1')
 
     required_arguments = parser.add_argument_group('required arguments')
     required_arguments.add_argument('-x', dest='type', choices=['ont', 'pb'],
