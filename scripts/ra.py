@@ -39,8 +39,8 @@ class Ra:
             eprint('[Ra::__exit__] warning: unable to clean work directory!')
 
     def run(self):
-        # overlap
-        eprint('[Ra::run] overlap stage')
+        # preconsruction overlap
+        eprint('[Ra::run] preconstruction overlap stage')
 
         minimap_params = [Ra.__minimap, '-t', str(self.threads)]
         if (self.tgs_type == 'ont'):
@@ -67,15 +67,72 @@ class Ra:
 
         overlaps_file.close()
 
+        # preconstruction
+        eprint('[Ra::run] preconstruction stage')
+
+        rala_params = [Ra.__rala, '-t', str(self.threads)]
+        if (self.include_unused):
+            rala_params.extend(['-u'])
+        rala_params.extend(['-p'])
+        rala_params.extend([self.tgs_sequences, overlaps])
+
+        preconstruction = os.path.join(self.work_directory, 'preconstruction.fasta')
+        try:
+            preconstruction_file = open(preconstruction, 'w')
+        except OSError:
+            eprint('[Ra::run] error: unable to create preconstruction file!')
+            sys.exit(1)
+
+        try:
+            p = subprocess.Popen(rala_params, stdout=preconstruction_file)
+        except OSError:
+            eprint('[Ra::run] error: unable to run rala!')
+            sys.exit(1)
+        p.communicate()
+        if (p.returncode != 0):
+            sys.exit(1)
+
+        preconstruction_file.close()
+
+        # overlap
+        eprint('[Ra::run] overlap stage')
+
+        minimap_params = [Ra.__minimap, '-t', str(self.threads)]
+        if (self.tgs_type == 'ont'):
+            minimap_params.extend(['-x', 'ava-ont'])
+        else:
+            minimap_params.extend(['-x', 'ava-pb'])
+        minimap_params.extend(['-f 0.00001', '--dual=yes'])
+        minimap_params.extend([preconstruction, self.tgs_sequences])
+
+        sensitive_overlaps = os.path.join(self.work_directory, 'sensitive_overlaps.paf')
+        try:
+            sensitive_overlaps_file = open(sensitive_overlaps, 'w')
+        except OSError:
+            eprint('[Ra::run] error: unable to create overlap file!')
+            sys.exit(1)
+
+        try:
+            p = subprocess.Popen(minimap_params, stdout=sensitive_overlaps_file)
+        except OSError:
+            eprint('[Ra::run] error: unable to run minimap2!')
+            sys.exit(1)
+        p.communicate()
+        if (p.returncode != 0):
+            sys.exit(1)
+
+        sensitive_overlaps_file.close()
+
         # layout
         eprint('[Ra::run] layout stage')
 
         rala_params = [Ra.__rala, '-t', str(self.threads)]
         if (self.include_unused):
             rala_params.extend(['-u'])
+        rala_params.extend(['-s', sensitive_overlaps])
         rala_params.extend([self.tgs_sequences, overlaps])
 
-        layout = os.path.join(self.work_directory, 'iter0.fasta')
+        layout = os.path.join(self.work_directory, 'layout.fasta')
         try:
             layout_file = open(layout, 'w')
         except OSError:
@@ -90,8 +147,6 @@ class Ra:
         p.communicate()
         if (p.returncode != 0):
             sys.exit(1)
-
-        layout_file.close()
 
         # consensus
         eprint('[Ra::run] consensus stage')
