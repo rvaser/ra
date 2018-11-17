@@ -258,7 +258,7 @@ class Ra:
         minimap_params[-2] = consensus
         minimap_params[-1] = self.ngs_sequences
 
-        mappings = os.path.join(self.work_directory, 'mappings_iter2.sam')
+        mappings = os.path.join(self.work_directory, 'mappings_iter2.paf')
         try:
             mappings_file = open(mappings, 'w')
         except OSError:
